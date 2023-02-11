@@ -1,0 +1,1 @@
+rails new jurassic_park --minimal --api
