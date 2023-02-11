@@ -40,7 +40,7 @@ module JurassicPark
     # Need to add a bit to make it work with test_unit
     config.generators do |g|
       g.test_fromework :test_unit, fixture_replacement: :fabrication
-      g.fixture_replacement :fabrication, dir: 'test/fabrication'
+      g.fixture_replacement :fabrication, dir: 'test/fabricators'
     end
   end
 end
