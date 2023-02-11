@@ -10,7 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_11_191801) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_11_210106) do
+  create_table "cages", force: :cascade do |t|
+    t.string "number", null: false
+    t.integer "vore_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["vore_id"], name: "index_cages_on_vore_id"
+  end
+
+  create_table "dinosaurs", force: :cascade do |t|
+    t.string "name", null: false
+    t.boolean "alive", default: true, null: false
+    t.integer "species_id", null: false
+    t.integer "vore_id", null: false
+    t.integer "cage_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cage_id"], name: "index_dinosaurs_on_cage_id"
+    t.index ["species_id"], name: "index_dinosaurs_on_species_id"
+    t.index ["vore_id"], name: "index_dinosaurs_on_vore_id"
+  end
+
   create_table "species", force: :cascade do |t|
     t.string "name", null: false
     t.integer "vore_id", null: false
@@ -25,5 +46,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_11_191801) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "cages", "vores"
+  add_foreign_key "dinosaurs", "cages"
+  add_foreign_key "dinosaurs", "species"
+  add_foreign_key "dinosaurs", "vores"
   add_foreign_key "species", "vores"
 end
