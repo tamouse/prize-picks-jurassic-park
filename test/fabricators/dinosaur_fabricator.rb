@@ -5,8 +5,7 @@ require 'faker'
 Fabricator(:dinosaur) do
   vore
   species { |attrs| Fabricate(:species, vore: attrs[:vore]) }
-  cage    { |attrs| Fabricate(:cage, vore: attrs[:vore]) }
 
-  name    { Faker::Name.name }
+  name    { sequence(:name) { |seq| "#{Faker::Name.name}#{seq}" } }
   alive   true
 end

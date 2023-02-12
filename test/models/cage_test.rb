@@ -4,10 +4,10 @@ require "test_helper"
 
 class CageTest < ActiveSupport::TestCase
   def setup
-    @vore = Fabricate :vore
+    @vore = Fabricate :vore, name: :carnivore
   end
 
-  test "a cage requires as unique number" do
+  test 'a cage requires as unique number' do
     number = '1234567'
 
     refute Cage.new(number: nil, vore: @vore).valid?
@@ -18,5 +18,18 @@ class CageTest < ActiveSupport::TestCase
     assert c2.errors.details[:number].any? do |detail|
       detail[:error] == :taken
     end
+  end
+
+  test 'cage con only hold a single vore' do
+    cage = Fabricate :cage, vore: @vore
+    s1 = Fabricate :carnivore_species, vore: @vore
+    d1 = Fabricate :dinosaur, vore: @vore, species: s1, name: 'Betty'
+    vore2 = Fabricate :vore, name: :herbivore
+    s2 = Fabricate :herbivore_species, vore: vore2
+    d2 = Fabricate :dinosaur, vore: vore2, species: s2, name: 'Bonnie'
+    cage.dinosaurs << d1
+    cage.dinosaurs << d2
+    refute cage.valid?
+    assert_includes cage.errors.details[:dinosaurs].pluck(:error), 'must all be same vore'
   end
 end

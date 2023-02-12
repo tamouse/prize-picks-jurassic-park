@@ -7,7 +7,6 @@ class DinosaurTest < ActiveSupport::TestCase
     d = Dinosaur.new
     refute d.valid?, 'Oops, new empty record should be invalid'
     refute_empty d.errors.details[:name]
-    refute_empty d.errors.details[:cage]
     refute_empty d.errors.details[:species]
     refute_empty d.errors.details[:vore]
   end

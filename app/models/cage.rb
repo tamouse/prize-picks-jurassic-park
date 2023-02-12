@@ -4,9 +4,8 @@
 class Cage < ApplicationRecord
   # Forces the rule that a cage can contain only a single type of vore
   belongs_to :vore
-  has_many :dinosaurs, dependent: :nullify
-
-  # TODO: Specify the relation with Dinosaurs and Cages as Assignments
+  has_many :assignments, dependent: :destroy
+  has_many :dinosaurs, through: :assignments
 
   validates :number, presence: true, uniqueness: true
   validate :same_vore_all_members
@@ -14,11 +13,9 @@ class Cage < ApplicationRecord
   private
 
   def same_vore_all_members
-    return if dinosaurs.blank?
+    return if assignments.empty?
 
     vore = dinosaurs.first.vore
-    errors.add(:dinosaurs, 'must all be same vore') unless dinosaurs.all? do |d|
-      d.vore == vore
-    end
+    errors.add(:dinosaurs, 'must all be same vore') unless dinosaurs.all? { _1.vore == vore }
   end
 end

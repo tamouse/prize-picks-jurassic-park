@@ -4,7 +4,8 @@
 class Dinosaur < ApplicationRecord
   belongs_to :species
   belongs_to :vore
-  belongs_to :cage
+  has_one :assignment
+  has_one :cage, through: :assignment
 
   validates :name, presence: true, uniqueness: true
 end
