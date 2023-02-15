@@ -2,10 +2,13 @@
 
 # Tne wee beasties! Rahr!
 class Dinosaur < ApplicationRecord
-  belongs_to :species
   belongs_to :vore
-  has_one :assignment
-  has_one :cage, through: :assignment
+  belongs_to :species
+
+  has_one :assignment, dependent: :destroy, autosave: true
+  # has_one :cage, through: :assignment
 
   validates :name, presence: true, uniqueness: true
+
+  delegate :cage, to: :assignment
 end

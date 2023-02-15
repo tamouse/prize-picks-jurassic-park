@@ -22,7 +22,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_11_231708) do
 
   create_table "cages", force: :cascade do |t|
     t.string "number", null: false
-    t.integer "vore_id", null: false
+    t.integer "vore_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["vore_id"], name: "index_cages_on_vore_id"

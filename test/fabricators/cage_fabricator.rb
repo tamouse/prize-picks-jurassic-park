@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Fabricator(:cage) do
-  number { Faker::Number.number.to_s }
+  number { sequence(:number) { |i| "#{i}-#{Faker::Number.number.to_s}" } }
   vore { Vore.find_or_create_by(name: Vore::VORE_TYPES.sample) }
 end
 
