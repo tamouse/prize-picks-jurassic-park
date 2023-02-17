@@ -7,4 +7,13 @@ class Vore < ApplicationRecord
 
   before_validation :slugify_name
   validates :name, presence: true, uniqueness: true, inclusion: { in: VORE_TYPES }
+
+  VORE_TYPES.each do |vore|
+    define_method vore.to_sym do
+      name == vore
+    end
+    define_method "#{vore}?".to_sym do
+      name == vore
+    end
+  end
 end

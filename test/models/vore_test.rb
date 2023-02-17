@@ -28,4 +28,25 @@ class VoreTest < ActiveSupport::TestCase
     assert(v2.errors.details[:name].any? { |e| e[:error] == :taken },
            'Oops: expecting an error of :taken')
   end
+
+  test "#herbivore" do
+    vore1 = Vore.create!(name: :herbivore)
+    vore2 = Vore.create!(name: :carnivore)
+
+    assert vore1.herbivore
+    assert vore1.herbivore?
+    refute vore2.herbivore
+    refute vore2.herbivore?
+  end
+
+  test "#carnivore" do
+    vore1 = Vore.create!(name: :carnivore)
+    vore2 = Vore.create!(name: :herbivore)
+
+    assert vore1.carnivore
+    assert vore1.carnivore?
+    refute vore2.carnivore
+    refute vore2.carnivore?
+  end
+
 end
