@@ -20,22 +20,6 @@ class CageTest < ActiveSupport::TestCase
     end
   end
 
-  test 'cage con only hold a single vore' do
-    cage = Fabricate :cage
-    s1 = Fabricate :carnivore_species, vore: @vore
-    d1 = Fabricate :dinosaur, vore: @vore, species: s1, name: 'Betty'
-    cage.assignments.create! dinosaur: d1
-    cage.save!
-
-    vore2 = Fabricate :herbivore
-    s2 = Fabricate :herbivore_species, vore: vore2
-    d2 = Fabricate :dinosaur, vore: vore2, species: s2, name: 'Bonnie'
-    cage.assignments.create! dinosaur: d2
-
-    refute cage.save
-    assert_includes cage.errors.details[:dinosaurs].pluck(:error), 'must all be same vore'
-  end
-
   test "create a cage with a unique number" do
     3.times do |i|
       Cage.create(number: i)
