@@ -72,9 +72,6 @@ GEM
     concurrent-ruby (1.2.0)
     crass (1.0.6)
     date (3.3.3)
-    debug (1.7.1)
-      irb (>= 1.5.0)
-      reline (>= 0.3.1)
     erubi (1.12.0)
     fabrication (2.30.0)
     faker (3.1.1)
@@ -83,9 +80,6 @@ GEM
       activesupport (>= 5.0)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
-    io-console (0.6.0)
-    irb (1.6.2)
-      reline (>= 0.3.0)
     loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -151,8 +145,6 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rake (13.0.6)
-    reline (0.3.2)
-      io-console (~> 0.5)
     sqlite3 (1.6.0-x86_64-darwin)
     thor (1.2.1)
     timeout (0.3.1)
@@ -168,7 +160,6 @@ PLATFORMS
 
 DEPENDENCIES
   byebug
-  debug
   fabrication
   faker
   pry
@@ -177,7 +168,6 @@ DEPENDENCIES
   puma (~> 5.0)
   rails (~> 7.0.4, >= 7.0.4.2)
   sqlite3 (~> 1.4)
-  tzinfo-data
 
 RUBY VERSION
    ruby 3.2.0p0
