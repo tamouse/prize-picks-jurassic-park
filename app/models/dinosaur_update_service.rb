@@ -33,6 +33,7 @@ class DinosaurUpdateService
     @update_succeeded = false
     unless update_params.empty?
       if dinosaur.update(update_params)
+        dinosaur.reload
         @update_succeeded = true
       else
         @update_succeeded = false
@@ -41,6 +42,8 @@ class DinosaurUpdateService
 
     unless cage_id.nil?
       if cage_dinosaur
+        dinosaur.reload
+        cage.reload
         @update_succeeded = true
       else
         @update_succeeded = false
@@ -50,13 +53,23 @@ class DinosaurUpdateService
     validate(:update)
   end
 
+  def success
+    @update_succeeded
+  end
+  alias :success? :success
+
   private
 
   def cage_dinosaur
     return true if dinosaur.cage == cage
 
+    current_cage = dinosaur.cage
+
     @cage_svc = DinosaurToCageService.new(dinosaur: dinosaur, cage: cage)
     success = @cage_svc.assign
+    dinosaur.save if dinosaur.changed?
+    cage.save if cage.changed?
+    current_cage.save if current_cage.changed?
     @cage_svc.errors.full_messages.each { |e| errors.add(:dinosaur_to_cage_service, e) } unless success
     success
   end

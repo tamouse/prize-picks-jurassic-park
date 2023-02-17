@@ -37,6 +37,7 @@ class DinosaurCreateService
     if dinosaur.save
       dinosaur.cage = cage if cage.present?
       dinosaur.save if dinosaur.changed?
+      cage.reload
     end
     validate(:create)
   end

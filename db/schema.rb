@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_11_210106) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_17_183816) do
   create_table "cages", force: :cascade do |t|
     t.string "number", null: false
     t.integer "vore_id"
     t.integer "species_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "dinosaurs_count"
     t.index ["species_id"], name: "index_cages_on_species_id"
     t.index ["vore_id"], name: "index_cages_on_vore_id"
   end

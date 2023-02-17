@@ -4,7 +4,7 @@
 class Dinosaur < ApplicationRecord
   belongs_to :vore
   belongs_to :species
-  belongs_to :cage, optional: true
+  belongs_to :cage, optional: true, counter_cache: true
 
   validates :name, presence: true, uniqueness: true
 
