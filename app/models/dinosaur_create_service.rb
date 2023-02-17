@@ -14,8 +14,6 @@ class DinosaurCreateService
 
   validate :persistance_of_dino, on: :create
   validate :persistance_of_cage, on: :create
-  validate :validate_assignment, on: :create
-
 
   def initialize(species:, name:)
     @species = case species
@@ -37,7 +35,8 @@ class DinosaurCreateService
     self.cage = find_suitable_cage
 
     if dinosaur.save
-      dinosaur.create_assignment(cage: @cage)
+      dinosaur.cage = cage if cage.present?
+      dinosaur.save if dinosaur.changed?
     end
     validate(:create)
   end
@@ -59,18 +58,24 @@ class DinosaurCreateService
 
   def find_suitable_cage
     # Must hold same vore
-    cage = Cage.find_by(vore: species.vore)
+    cage = species.herbivore? ? Cage.find_by(vore: species.vore) : Cage.find_by(species: species)
+    return cage unless cage.nil?
+
+    # Cage with no assigned species yet
+    cage = species.herbivore? ? Cage.find_by(vore: nil) : Cage.find_by(vore: nil, species: nil)
+
     if cage.nil?
-      # Cage with no assigned species yet
-      cage = Cage.find_by(vore: nil)
-      if cage.nil?
-        # No cages available for this vore
-        cage = Cage.create_with_next_number(vore: species.vore)
-      else
-        # Fill in the vore so no other vores can be assigned
-        cage.update(vore: species.vore)
-      end
+      # No cages available for this vore
+      cage = Cage.create_with_next_number
     end
+
+    # Fill in the vore so no other vores can be assigned
+    if species.herbivore?
+      cage.update(vore: species.vore)
+    else
+      cage.update(vore: species.vore, species: species)
+    end
+
     cage
   end
 
@@ -96,20 +101,6 @@ class DinosaurCreateService
         dinosaur.errors.full_messages.each do |msg|
           errors.add(:dinosaur, msg)
         end
-      end
-    end
-  end
-
-  def validate_assignment
-    return if dinosaur.nil?
-    return unless dinosaur.persisted?
-
-    if dinosaur.assignment.nil?
-      errors.add(:assignment, :blank)
-    else
-      unless dinosaur.assignment.persisted?
-        errors.add(:assignment, 'not saved')
-        dinosaur.assignment.errors.full_messages.each { |msg| errors.add(:assignment, msg) }
       end
     end
   end

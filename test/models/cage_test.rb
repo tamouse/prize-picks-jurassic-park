@@ -12,12 +12,10 @@ class CageTest < ActiveSupport::TestCase
 
     refute Cage.new(number: nil, vore: @vore).valid?
     refute Cage.new(number: '',  vore: @vore).valid?
-    Cage.create!(number:, vore: @vore)
+    assert Cage.create(number:, vore: @vore)
     c2 = Cage.new(number:, vore: @vore)
     refute c2.valid?
-    assert c2.errors.details[:number].any? do |detail|
-      detail[:error] == :taken
-    end
+    assert c2.errors.details[:number].any? { |detail| detail[:error] == :taken }
   end
 
   test "create a cage with a unique number" do

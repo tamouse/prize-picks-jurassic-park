@@ -4,44 +4,41 @@ class DinosaurToCageService
   include ActiveModel::Validations
 
   attr_reader :dinosaur
-  attr_reader :cage_id
   attr_reader :cage
 
   validates_presence_of :dinosaur
+  validates_presence_of :cage, on: :create
+  validate on: :assign do
+    if dinosaur.cage != cage
+      errors.add(:base, 'assignment of dinosaur #{dinosaur.id} to cage #{cage.id} failed')
+    end
+  end
 
-  def initialize(dinosaur:, cage_id: nil)
+  def initialize(dinosaur:, cage: nil)
     @dinosaur = dinosaur
-    @cage_id = cage_id
+    @cage = cage
   end
 
   def assign
-    return true if dinosaur.assignment&.cage_id == cage_id
+    return true if dinosaur.cage = cage
     return false unless valid?
 
     @cage = ensure_cage_is_ready
-    unless cage.persisted?
-      errors.add(:cage, 'not present')
+    return false unless valid?(:create)
+
+    unless dinosaur.update(cage_id: cage.id)
+      dinosaur.errors.full_messages.each { |e| errors.add(:dinosaur, e) }
       return false
     end
 
-    ApplicationRecord.transaction do
-      dinosaur.assignment&.destroy
-      dinosaur.create_assignment(cage: cage)
-      if cage.vore_id.nil?
-        cage.update(vore: dinosaur.vore)
-      end
-    end
-
-    return true if dinosaur.assignment.cage == cage
+    validate(:assign)
   end
 
   private
 
   def ensure_cage_is_ready
-    if cage_id.nil?
-      Cage.create_with_next_number
-    else
-      Cage.find_by(id: cage_id)
-    end
+    return cage if cage.persisted?
+
+    Cage.create_with_next_number(vore: dinosaur.species.vore, species: dinosaur.species)
   end
 end

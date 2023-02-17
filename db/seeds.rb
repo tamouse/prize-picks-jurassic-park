@@ -43,9 +43,15 @@ class JurassicParkSeeder
     end
   end
 
-  def seed_cages(vore)
-    puts "Seeding cage for vore #{vore.name}"
-    Cage.create!(number: "#{vore.name}0", vore_id: vore.id)
+  def seed_cages(species)
+    if species.vore.name == :herbivore
+      puts "Seeding cage for vore #{species.vore.name}"
+      Cage.create!(number: "#{species.vore.name}0", vore_id: species.vore.id)
+    else
+      puts "Seeding cage for species #{species.name}"
+      Cage.create!(number: "#{species.name}0", vore_id: species.vore.id, species_id: species.id)
+    end
+
   end
 
   def seed_dinos(species)
@@ -55,9 +61,8 @@ class JurassicParkSeeder
     end
 
     puts "Seeding dinosaur #{@name}"
-    dino = Dinosaur.create!(species: species, vore: species.vore, name: @name)
-    cage = Cage.find_by(vore: species.vore)
-    dino.create_assignment(cage: cage)
+    svc = DinosaurCreateService.new(species: species, name: name)
+    svc.create
   end
 end
 
@@ -65,12 +70,19 @@ seeder = JurassicParkSeeder.new
 
 seeder.destroy_all_prior
 seeder.seed_vores
+
+puts 'Seeding cages'
 Vore.find_each do |vore|
   seeder.seed_species(vore)
-  seeder.seed_cages(vore)
 end
 
-# Two of each
+puts 'Seeding species'
 Species.find_each do |species|
+  seeder.seed_cages(species)
+end
+
+puts 'Seeding dinosaurs'
+Species.find_each do |species|
+  # Two of each
   2.times { seeder.seed_dinos(species) }
 end

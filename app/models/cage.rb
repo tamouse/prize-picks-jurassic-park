@@ -6,8 +6,7 @@ class Cage < ApplicationRecord
   belongs_to :vore, optional: true
   belongs_to :species, optional: true
 
-  has_many :assignments, dependent: :destroy, autosave: true
-  has_many :dinosaurs, through: :assignments
+  has_many :dinosaurs, dependent: :nullify
 
   before_validation :update_vore_and_species
   validates :number, presence: true, uniqueness: true

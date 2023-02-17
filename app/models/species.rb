@@ -10,4 +10,6 @@ class Species < ApplicationRecord
 
   before_validation :slugify_name
   validates :name, presence: true, uniqueness: true, inclusion: { in: ALL_SPECIES }
+
+  delegate :herbivore, :herbivore?, :carnivore, :carnivore?, to: :vore, allow_nil: true
 end

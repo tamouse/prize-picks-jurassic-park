@@ -10,7 +10,6 @@ class DinosaurToCageServiceTest < ActiveSupport::TestCase
     @cage = Fabricate :cage
     @new_cage = Fabricate :cage
     @dinosaur = Fabricate :dinosaur, species: species, vore: vore
-    @dinosaur.create_assignment(cage: @cage)
   end
 
   teardown do
@@ -18,9 +17,16 @@ class DinosaurToCageServiceTest < ActiveSupport::TestCase
   end
 
   test 'can initialize the service' do
-    service = DinosaurToCageService.new(dinosaur: @dinosaur, cage_id: @new_cage.id)
+    service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @cage)
     assert service.present?
     assert service.dinosaur.present?
+    assert service.cage.present?
+  end
+
+  test 'can move dinosaurs to a differnt cage' do
+    service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @cage)
+    assert service.assign
+    assert_equal @cage, @dinosaur.cage
   end
 
 end
