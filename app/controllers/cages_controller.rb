@@ -8,12 +8,15 @@ class CagesController < ApplicationController
   def index
     @cages = Cage.all
 
-    render json: @cages
+    payload = {
+      cages: @cages.map { render_cage(_1, false)}
+    }
+    render json: payload
   end
 
   # GET /cages/1
   def show
-    render json: @cage
+    render json: render_cage(@cage)
   end
 
   # POST /cages
@@ -22,7 +25,7 @@ class CagesController < ApplicationController
     @cage = Cage.new(cage_params)
 
     if @cage.save
-      render json: @cage, status: :created, location: @cage
+      render json: render_cage(@cage), status: :created, location: @cage
     else
       render json: @cage.errors, status: :unprocessable_entity
     end
@@ -32,7 +35,7 @@ class CagesController < ApplicationController
   def update
     # TODO: Replace this with an operation
     if @cage.update(cage_params)
-      render json: @cage
+      render json: render_cage(@cage)
     else
       render json: @cage.errors, status: :unprocessable_entity
     end
@@ -55,4 +58,17 @@ class CagesController < ApplicationController
   def cage_params
     params.require(:cage).permit(:number, :vore_id)
   end
+
+  def render_cage(cage, root = true)
+    cage.as_json(
+      root: root,
+      include: [
+        dinosaurs: {
+          include: [:species, :vore]
+        },
+        vore: {}
+      ]
+    )
+  end
+
 end

@@ -4,11 +4,15 @@ class DinosaursController < ApplicationController
   def index
     @dinosaurs = Dinosaur.all
 
-    render json: @dinosaurs
+    payload = {
+      dinosaurs: @dinosaurs.map { render_dinosaur(_1, false) }
+    }
+
+    render json: payload
   end
 
   def show
-    render json: @dinosaur
+    render json: render_dinosaur(@dinosaur)
   end
 
   def create
@@ -53,13 +57,13 @@ class DinosaursController < ApplicationController
     params.require(:dinosaur).permit(:name, :alive, :cage_id)
   end
 
-  def render_dinosaur(dinosaur)
+  def render_dinosaur(dinosaur, root = true)
     dinosaur.as_json(
-      root: true,
+      root: root,
       include: [
-        :vore,
+        cage: { include: :vore },
         species: { include: :vore },
-        cage: { include: :vore }
+        vore: {}
       ]
     )
   end
