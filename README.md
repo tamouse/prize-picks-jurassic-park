@@ -2,6 +2,9 @@
 
 Jurassic Park Safe Software: _nothing could go wrong, trust us._
 
+Author: Tamara Temple <https://github.com/tamouse> <tamouse@gmail.com>
+Date: 2023-02-17T16:22:31-0600
+
 ## Installation
 
 ### Pre-requesites ###
