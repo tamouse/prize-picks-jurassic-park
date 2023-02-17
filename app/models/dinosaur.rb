@@ -10,5 +10,5 @@ class Dinosaur < ApplicationRecord
 
   validates :name, presence: true, uniqueness: true
 
-  delegate :cage, to: :assignment
+  delegate :cage, to: :assignment, allow_nil: true
 end

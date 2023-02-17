@@ -6,7 +6,7 @@ class AssignmentTest < ActiveSupport::TestCase
     @species = Fabricate :species, vore: @vore
     @cage = Fabricate :cage
 
-    @dinosaur = Fabricate :dinosaur, cage_id: nil, species: @species, vore: @vore
+    @dinosaur = Fabricate :dinosaur, species: @species, vore: @vore
   end
 
   test 'can assign a dinosaur to a cage' do

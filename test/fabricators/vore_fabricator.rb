@@ -4,8 +4,8 @@ Fabricator(:vore) do
   name { Vore::VORE_TYPES.sample }
 end
 
-Fabricator(:carinore, from: :vore) do
-  name { 'Carinore' }
+Fabricator(:carnivore, from: :vore) do
+  name { 'Carnivore' }
 end
 
 Fabricator(:herbivore, from: :vore) do

@@ -11,7 +11,32 @@ class Cage < ApplicationRecord
   validates :number, presence: true, uniqueness: true
   validate :same_vore_all_members
 
+  def self.create_with_next_number(**kwargs)
+    new.create_with_next_number(**kwargs)
+  end
+
+
+  def create_with_next_number(**kwargs)
+    number = kwargs.delete(:number)
+    assign_attributes(**kwargs) unless kwargs.empty?
+    if number.nil?
+      self.number = get_next_number
+    end
+    self if save
+  end
+
   private
+
+  def get_next_number
+    max = self.class.maximum(:number)
+    return "0" unless max.present?
+
+    if max[-1].match(/\d/)
+      max.split(/[^\d]+/).last.to_i + 1
+    else
+      max + "0"
+    end
+  end
 
   def same_vore_all_members
     return if assignments.empty?
@@ -23,6 +48,6 @@ class Cage < ApplicationRecord
   end
 
   def update_vore
-    self.vore = dinosaurs.empty? ? nil : dinosaurs.first.vore
+    self.vore ||= dinosaurs.empty? ? nil : dinosaurs.first.vore
   end
 end

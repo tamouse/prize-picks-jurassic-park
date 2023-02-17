@@ -33,10 +33,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_11_231708) do
     t.boolean "alive", default: true, null: false
     t.integer "species_id", null: false
     t.integer "vore_id", null: false
-    t.integer "cage_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["cage_id"], name: "index_dinosaurs_on_cage_id"
     t.index ["species_id"], name: "index_dinosaurs_on_species_id"
     t.index ["vore_id"], name: "index_dinosaurs_on_vore_id"
   end
@@ -58,7 +56,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_11_231708) do
   add_foreign_key "assignments", "cages"
   add_foreign_key "assignments", "dinosaurs"
   add_foreign_key "cages", "vores"
-  add_foreign_key "dinosaurs", "cages"
   add_foreign_key "dinosaurs", "species"
   add_foreign_key "dinosaurs", "vores"
   add_foreign_key "species", "vores"

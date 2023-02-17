@@ -4,7 +4,7 @@ require "test_helper"
 
 class CageTest < ActiveSupport::TestCase
   def setup
-    @vore = Fabricate :vore, name: :carnivore
+    @vore = Fabricate :carnivore
   end
 
   test 'a cage requires as unique number' do
@@ -27,12 +27,20 @@ class CageTest < ActiveSupport::TestCase
     cage.assignments.create! dinosaur: d1
     cage.save!
 
-    vore2 = Fabricate :vore, name: :herbivore
+    vore2 = Fabricate :herbivore
     s2 = Fabricate :herbivore_species, vore: vore2
     d2 = Fabricate :dinosaur, vore: vore2, species: s2, name: 'Bonnie'
     cage.assignments.create! dinosaur: d2
 
     refute cage.save
     assert_includes cage.errors.details[:dinosaurs].pluck(:error), 'must all be same vore'
+  end
+
+  test "create a cage with a unique number" do
+    3.times do |i|
+      Cage.create(number: i)
+    end
+    cage = Cage.create_with_next_number
+    assert '3', cage.number
   end
 end

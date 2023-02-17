@@ -20,16 +20,30 @@ class DinosaursControllerTest < ActionDispatch::IntegrationTest
       post dinosaurs_url,
            params: {
              dinosaur: {
-               alive: new_dino[:alive],
                name: new_dino[:name],
-               species_id: new_dino[:species_id],
-               vore_id: new_dino[:vore_id]
+               species_id: new_dino[:species_id]
              }
            },
            as: :json
     end
 
     assert_response :created
+  end
+
+  test "should give an error when duplicate name chosen" do
+    assert_no_difference("Dinosaur.count") do
+      post dinosaurs_url,
+           params: {
+             dinosaur: {
+               name: @dinosaur.name,
+               species_id: @species.id
+             }
+           },
+           as: :json
+
+      assert_response :unprocessable_entity
+    end
+
   end
 
   test "should show dinosaur" do
