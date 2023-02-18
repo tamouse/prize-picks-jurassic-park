@@ -7,8 +7,8 @@ class DinosaurToCageServiceTest < ActiveSupport::TestCase
   setup do
     diet = Fabricate :diet
     species = Fabricate :species, diet: diet
-    @cage = Fabricate :cage
-    @new_cage = Fabricate :cage
+    @cage = Fabricate :cage, species: species, diet: diet
+    @new_cage = Fabricate :cage, species: species, diet: diet
     @dinosaur = Fabricate :dinosaur, species: species, diet: diet
   end
 
@@ -23,10 +23,10 @@ class DinosaurToCageServiceTest < ActiveSupport::TestCase
     assert service.cage.present?
   end
 
-  test 'can move dinosaurs to a differnt cage' do
-    service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @cage)
-    assert service.assign
-    assert_equal @cage, @dinosaur.cage
+  test 'can move dinosaurs to a different cage' do
+    service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @new_cage)
+    assert service.assign, "oops: service.errors: #{service.errors.details.inspect}"
+    assert_equal @new_cage, @dinosaur.cage
   end
 
 end

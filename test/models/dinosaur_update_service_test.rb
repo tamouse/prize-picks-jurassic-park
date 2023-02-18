@@ -7,7 +7,7 @@ class DinosaurUpdateServiceTest < ActiveSupport::TestCase
   setup do
     diet = Fabricate :diet
     species = Fabricate :species, diet: diet
-    @cage = Fabricate :cage
+    @cage = Fabricate :cage, diet: diet, species: species
     @dinosaur = Fabricate :dinosaur, species: species, diet: diet
     to_cage_svc = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @cage)
     assert to_cage_svc.assign, "oops, to_cage_svc errors, #{to_cage_svc.errors.full_messages.join("\n")}"
