@@ -27,7 +27,9 @@ class DinosaurToCageService
     return false unless valid?(:create)
 
     unless dinosaur.update(cage_id: cage.id)
-      dinosaur.errors.full_messages.each { |e| errors.add(:dinosaur, e) }
+      dinosaur.errors.full_messages.each { |e| errors.add(:dinosaur, e) } if dinosaur.errors
+      cage.errors.full_messages.each { |e| errors.add(:cage, e) } if cage.errors
+
       return false
     end
 

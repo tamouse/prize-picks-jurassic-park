@@ -10,13 +10,13 @@ class Cage < ApplicationRecord
 
   before_validation :update_diet_and_species
   validates :number, presence: true, uniqueness: true
+  validate :compatibility
 
   delegate :herbivore, :herbivore?, :carnivore, :carnivore?, to: :diet, allow_nil: true
 
   def self.create_with_next_number(**kwargs)
     new.create_with_next_number(**kwargs)
   end
-
 
   def create_with_next_number(**kwargs)
     number = kwargs.delete(:number)
@@ -28,6 +28,22 @@ class Cage < ApplicationRecord
   end
 
   private
+
+  def compatibility
+    return if dinosaurs.count.zero?
+    # Herbivore cages can't hold any carnivores
+    # Carnivore cages can only hold one species
+
+    unless dinosaurs.joins(:diet).all? { _1.diet == diet }
+      errors.add(:dinosaurs, 'must all have same diet')
+      return
+    end
+
+    if :carnivore? && dinosaurs.joins(:species).all? { _1.species != species }
+      errors.add(:dinosaurs, 'must all be same species when carnivore')
+    end
+  end
+
 
   def get_next_number
     max = self.class.maximum(:number)

@@ -27,30 +27,50 @@ class CageTest < ActiveSupport::TestCase
     assert '3', cage.number
   end
 
-  test 'verify #dinosaur_counter' do
-    create_service = DinosaurCreateService.new(species: @species, name: 'Betty')
-    success = create_service.create
-    assert success
-    cage = create_service.cage
-    assert_equal 1, cage.dinosaurs_count
-    assert_equal 1, cage.dinosaurs.count
-    assert_equal 1, cage.dinosaurs.length
-    assert_equal 1, cage.dinosaurs.size
+  test 'validate no mixing of herbivores and carnivores' do
+    h_diet = @diet
+    h_species = @species
+    h_dino = Dinosaur.create!(name: 'Marge', species: h_species, diet: h_diet)
 
-    cage2 = Cage.create_with_next_number(species: @species, diet: @diet)
-    update_service = DinosaurUpdateService.new(dinosaur: create_service.dinosaur, cage_id: cage2.id)
-    assert update_service.update
-    cage.reload
-    cage2.reload
-    assert_equal cage2, update_service.cage
+    c_diet = Diet.create!(name: :carnivore)
+    c_species = Species.create!(name: :velociraptor, diet: c_diet)
+    c_dino = Dinosaur.create!(name: 'Mabel', species: c_species, diet: c_diet)
+
+    cage = Cage.create!(number: '2167')
+
+    cage.dinosaurs << h_dino
+    assert cage.valid?
+    cage.save!
+
+    cage.dinosaurs << c_dino
+    refute cage.valid?
+  end
+
+  test 'verify #dinosaur_counter' do
+    dinosaur = Dinosaur.create!(name: 'Bobbie Joe', species: @species, diet: @diet)
+    cage1 = Cage.create!(number: '001', species: @species, diet: @diet)
+    cage2 = Cage.create!(number: '002', species: @species, diet: @diet)
+
+    cage1.dinosaurs << dinosaur
+    assert cage1.save
+    assert_equal 1, cage1.dinosaurs_count
+    assert_equal 1, cage1.dinosaurs.count
+    assert_equal 1, cage1.dinosaurs.length
+    assert_equal 1, cage1.dinosaurs.size
+
+    cage2.dinosaurs << dinosaur
+    assert cage2.save
+
     assert_equal 1, cage2.dinosaurs_count
     assert_equal 1, cage2.dinosaurs.count
     assert_equal 1, cage2.dinosaurs.length
     assert_equal 1, cage2.dinosaurs.size
-    assert_equal 0, cage.dinosaurs_count
-    assert_equal 0, cage.dinosaurs.count
-    assert_equal 0, cage.dinosaurs.length
-    assert_equal 0, cage.dinosaurs.size
+
+    cage1.reload
+    assert_equal 0, cage1.dinosaurs_count
+    assert_equal 0, cage1.dinosaurs.count
+    assert_equal 0, cage1.dinosaurs.length
+    assert_equal 0, cage1.dinosaurs.size
 
   end
 end
