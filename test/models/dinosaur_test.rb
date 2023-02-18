@@ -8,7 +8,7 @@ class DinosaurTest < ActiveSupport::TestCase
     refute d.valid?, 'Oops, new empty record should be invalid'
     refute_empty d.errors.details[:name]
     refute_empty d.errors.details[:species]
-    refute_empty d.errors.details[:vore]
+    refute_empty d.errors.details[:diet]
   end
 
   test 'fabricator should work' do

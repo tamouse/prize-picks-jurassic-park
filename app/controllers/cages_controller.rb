@@ -56,7 +56,7 @@ class CagesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def cage_params
-    params.require(:cage).permit(:number, :vore_id)
+    params.require(:cage).permit(:number, :diet_id)
   end
 
   def render_cage(cage, root = true)
@@ -64,9 +64,9 @@ class CagesController < ApplicationController
       root: root,
       include: [
         dinosaurs: {
-          include: [:species, :vore]
+          include: [:species, :diet]
         },
-        vore: {}
+        diet: {}
       ]
     )
   end

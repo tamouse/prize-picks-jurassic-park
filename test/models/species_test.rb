@@ -20,10 +20,10 @@ class SpeciesTest < ActiveSupport::TestCase
   end
 
   test 'validate species name is unique' do
-    vore = Fabricate :herbivore
+    diet = Fabricate :herbivore
     name = Species::HERBIVORE_SPECIES.sample
-    _species1 = Species.create!(name:, vore:)
-    species2 = Species.new(name:, vore:)
+    _species1 = Species.create!(name:, diet:)
+    species2 = Species.new(name:, diet:)
     refute species2.valid?, 'Oops, species.name must be unique'
     refute_empty species2.errors.details[:name]
     assert(species2.errors.details[:name].any? { |e| e[:error] == :taken },

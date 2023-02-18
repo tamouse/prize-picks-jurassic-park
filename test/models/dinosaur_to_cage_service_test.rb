@@ -5,11 +5,11 @@ require 'test_helper'
 class DinosaurToCageServiceTest < ActiveSupport::TestCase
 
   setup do
-    vore = Fabricate :vore
-    species = Fabricate :species, vore: vore
+    diet = Fabricate :diet
+    species = Fabricate :species, diet: diet
     @cage = Fabricate :cage
     @new_cage = Fabricate :cage
-    @dinosaur = Fabricate :dinosaur, species: species, vore: vore
+    @dinosaur = Fabricate :dinosaur, species: species, diet: diet
   end
 
   teardown do

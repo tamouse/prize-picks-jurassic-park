@@ -49,7 +49,7 @@ class DinosaurCreateService
       name: name,
       alive: true,
       species: species,
-      vore: species.vore
+      diet: species.diet
     )
   end
 
@@ -58,23 +58,23 @@ class DinosaurCreateService
   end
 
   def find_suitable_cage
-    # Must hold same vore
-    cage = species.herbivore? ? Cage.find_by(vore: species.vore) : Cage.find_by(species: species)
+    # Must hold same diet
+    cage = species.herbivore? ? Cage.find_by(diet: species.diet) : Cage.find_by(species: species)
     return cage unless cage.nil?
 
     # Cage with no assigned species yet
-    cage = species.herbivore? ? Cage.find_by(vore: nil) : Cage.find_by(vore: nil, species: nil)
+    cage = species.herbivore? ? Cage.find_by(diet: nil) : Cage.find_by(diet: nil, species: nil)
 
     if cage.nil?
-      # No cages available for this vore
+      # No cages available for this diet
       cage = Cage.create_with_next_number
     end
 
-    # Fill in the vore so no other vores can be assigned
+    # Fill in the diet so no other diets can be assigned
     if species.herbivore?
-      cage.update(vore: species.vore)
+      cage.update(diet: species.diet)
     else
-      cage.update(vore: species.vore, species: species)
+      cage.update(diet: species.diet, species: species)
     end
 
     cage

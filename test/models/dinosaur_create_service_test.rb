@@ -5,8 +5,8 @@ require 'test_helper'
 class DinosaurCreateServiceTest < ActiveSupport::TestCase
 
   setup do
-    @vore = Vore.create(name: :herbivore)
-    @species = Species.create(vore: @vore, name: :triceratops)
+    @diet = Diet.create(name: :herbivore)
+    @species = Species.create(diet: @diet, name: :triceratops)
   end
 
   teardown do
@@ -36,12 +36,12 @@ class DinosaurCreateServiceTest < ActiveSupport::TestCase
     assert service.dinosaur.persisted?
     assert service.cage.persisted?
     assert_includes service.cage.dinosaurs, service.dinosaur
-    assert_equal @species.vore, service.dinosaur.vore
-    assert_equal @species.vore, service.cage.vore
+    assert_equal @species.diet, service.dinosaur.diet
+    assert_equal @species.diet, service.cage.diet
   end
 
   test "can't create a dinosaur with a duplicate name" do
-    dino1 = Fabricate :dinosaur, species: @species, vore: @vore
+    dino1 = Fabricate :dinosaur, species: @species, diet: @diet
     service = DinosaurCreateService.new(species: @species, name: dino1.name)
     refute service.create
     expected = {

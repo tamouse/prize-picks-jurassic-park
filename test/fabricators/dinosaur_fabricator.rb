@@ -3,8 +3,8 @@
 require 'faker'
 
 Fabricator(:dinosaur) do
-  vore
-  species { |attrs| Fabricate(:species, vore: attrs[:vore]) }
+  diet
+  species { |attrs| Fabricate(:species, diet: attrs[:diet]) }
 
   name    { sequence(:name) { |seq| "#{Faker::Name.name}#{seq}" } }
   alive   true

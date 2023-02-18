@@ -24,7 +24,7 @@ class DinosaurUpdateService
     @alive = alive
     @cage_id = cage_id
     @cage = Cage.find_by(id: cage_id)
-    @cage = Cage.create_with_next_number(vore: dinosaur.species.vore, species: dinosaur.species) if @cage.nil?
+    @cage = Cage.create_with_next_number(diet: dinosaur.species.diet, species: dinosaur.species) if @cage.nil?
   end
 
   def update

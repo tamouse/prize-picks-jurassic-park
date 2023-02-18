@@ -5,10 +5,10 @@ require 'test_helper'
 class DinosaurUpdateServiceTest < ActiveSupport::TestCase
 
   setup do
-    vore = Fabricate :vore
-    species = Fabricate :species, vore: vore
+    diet = Fabricate :diet
+    species = Fabricate :species, diet: diet
     @cage = Fabricate :cage
-    @dinosaur = Fabricate :dinosaur, species: species, vore: vore
+    @dinosaur = Fabricate :dinosaur, species: species, diet: diet
     to_cage_svc = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @cage)
     assert to_cage_svc.assign, "oops, to_cage_svc errors, #{to_cage_svc.errors.full_messages.join("\n")}"
   end
@@ -47,7 +47,7 @@ class DinosaurUpdateServiceTest < ActiveSupport::TestCase
     old_name = @dinosaur.name
     old_alive = @dinosaur.alive
     old_cage = @dinosaur.cage
-    new_cage = Fabricate :cage, vore: @dinosaur.species.vore, species: @dinosaur.species
+    new_cage = Fabricate :cage, diet: @dinosaur.species.diet, species: @dinosaur.species
 
     service = DinosaurUpdateService.new(dinosaur: @dinosaur, cage_id: new_cage.id)
 

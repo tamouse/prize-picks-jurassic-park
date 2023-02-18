@@ -5,8 +5,8 @@ require "test_helper"
 class DinosaursControllerTest < ActionDispatch::IntegrationTest
   setup do
     @species = Fabricate :species
-    @cage = Fabricate :cage, vore: @species.vore
-    @dinosaur = Fabricate :dinosaur, species: @species, vore: @species.vore
+    @cage = Fabricate :cage, diet: @species.diet
+    @dinosaur = Fabricate :dinosaur, species: @species, diet: @species.diet
   end
 
   test "should get index" do
@@ -15,7 +15,7 @@ class DinosaursControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create dinosaur" do
-    new_dino = Fabricate.attributes_for :dinosaur, species: @species, vore: @species.vore
+    new_dino = Fabricate.attributes_for :dinosaur, species: @species, diet: @species.diet
     assert_difference("Dinosaur.count") do
       post dinosaurs_url,
            params: {
