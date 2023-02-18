@@ -4,17 +4,17 @@ require "test_helper"
 
 class CageTest < ActiveSupport::TestCase
   def setup
-    @vore = Fabricate :herbivore
-    @species = Fabricate :herbivore_species, vore: @vore
+    @diet = Fabricate :herbivore
+    @species = Fabricate :herbivore_species, diet: @diet
   end
 
   test 'a cage requires as unique number' do
     number = '1234567'
 
-    refute Cage.new(number: nil, vore: @vore).valid?
-    refute Cage.new(number: '',  vore: @vore).valid?
-    assert Cage.create(number:, vore: @vore)
-    c2 = Cage.new(number:, vore: @vore)
+    refute Cage.new(number: nil, diet: @diet).valid?
+    refute Cage.new(number: '',  diet: @diet).valid?
+    assert Cage.create(number:, diet: @diet)
+    c2 = Cage.new(number:, diet: @diet)
     refute c2.valid?
     assert c2.errors.details[:number].any? { |detail| detail[:error] == :taken }
   end
@@ -37,7 +37,7 @@ class CageTest < ActiveSupport::TestCase
     assert_equal 1, cage.dinosaurs.length
     assert_equal 1, cage.dinosaurs.size
 
-    cage2 = Cage.create_with_next_number(species: @species, vore: @vore)
+    cage2 = Cage.create_with_next_number(species: @species, diet: @diet)
     update_service = DinosaurUpdateService.new(dinosaur: create_service.dinosaur, cage_id: cage2.id)
     assert update_service.update
     cage.reload

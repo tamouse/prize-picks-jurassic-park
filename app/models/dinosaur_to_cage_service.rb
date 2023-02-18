@@ -39,6 +39,6 @@ class DinosaurToCageService
   def ensure_cage_is_ready
     return cage if cage.persisted?
 
-    Cage.create_with_next_number(vore: dinosaur.species.vore, species: dinosaur.species)
+    Cage.create_with_next_number(diet: dinosaur.species.diet, species: dinosaur.species)
   end
 end

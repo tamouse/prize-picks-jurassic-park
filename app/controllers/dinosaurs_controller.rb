@@ -61,9 +61,9 @@ class DinosaursController < ApplicationController
     dinosaur.as_json(
       root: root,
       include: [
-        cage: { include: :vore },
-        species: { include: :vore },
-        vore: {}
+        cage: { include: :diet },
+        species: { include: :diet },
+        diet: {}
       ]
     )
   end

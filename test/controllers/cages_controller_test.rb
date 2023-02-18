@@ -13,7 +13,7 @@ class CagesControllerTest < ActionDispatch::IntegrationTest
   test "should create cage" do
     new_cage = Fabricate.attributes_for :cage
     assert_difference("Cage.count") do
-      post cages_url, params: { cage: { number: new_cage['number'], vore_id: new_cage['vore_id'] } }, as: :json
+      post cages_url, params: { cage: { number: new_cage['number'], diet_id: new_cage['vore_id'] } }, as: :json
     end
 
     assert_response :created

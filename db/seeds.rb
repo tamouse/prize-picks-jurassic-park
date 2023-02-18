@@ -13,43 +13,42 @@ class JurassicParkSeeder
   def destroy_all_prior
     puts 'Remove all old records'
     ApplicationRecord.transaction do
-      Assignment.destroy_all
       Cage.destroy_all
       Dinosaur.destroy_all
       Species.destroy_all
-      Vore.destroy_all
+      Diet.destroy_all
     end
   rescue => e
     fail "Failure to remove old records: #{e.class}: '#{e}'"
   end
 
-  def seed_vores
-    puts 'Seeding vores'
-    Vore::VORE_TYPES.each do |vt|
-      Vore.create! name: vt
+  def seed_diets
+    puts 'Seeding diets'
+    Diet::DIET_TYPES.each do |vt|
+      Diet.create! name: vt
     end
   end
 
-  def seed_species(vore)
-    puts "Seeding species for vore #{vore.name}"
-    if vore.name == 'herbivore'
+  def seed_species(diet)
+    puts "Seeding species for diet #{diet.name}"
+    if diet.name == 'herbivore'
       Species::HERBIVORE_SPECIES.each do |species_name|
-        Species.create! name: species_name, vore_id: vore.id
+        Species.create! name: species_name, diet_id: diet.id
       end
     else
       Species::CARNIVORE_SPECIES.each do |species_name|
-        Species.create! name: species_name, vore_id: vore.id
+        Species.create! name: species_name, diet_id: diet.id
       end
     end
   end
 
   def seed_cages(species)
-    if species.vore.name == :herbivore
-      puts "Seeding cage for vore #{species.vore.name}"
-      Cage.create!(number: "#{species.vore.name}0", vore_id: species.vore.id)
+    if species.diet.name == :herbivore
+      puts "Seeding cage for diet #{species.diet.name}"
+      Cage.create!(number: "#{species.diet.name}0", diet_id: species.diet.id)
     else
       puts "Seeding cage for species #{species.name}"
-      Cage.create!(number: "#{species.name}0", vore_id: species.vore.id, species_id: species.id)
+      Cage.create!(number: "#{species.name}0", diet_id: species.diet.id, species_id: species.id)
     end
 
   end
@@ -61,7 +60,7 @@ class JurassicParkSeeder
     end
 
     puts "Seeding dinosaur #{@name}"
-    svc = DinosaurCreateService.new(species: species, name: name)
+    svc = DinosaurCreateService.new(species: species, name: @name)
     svc.create
   end
 end
@@ -69,11 +68,11 @@ end
 seeder = JurassicParkSeeder.new
 
 seeder.destroy_all_prior
-seeder.seed_vores
+seeder.seed_diets
 
 puts 'Seeding cages'
-Vore.find_each do |vore|
-  seeder.seed_species(vore)
+Diet.find_each do |diet|
+  seeder.seed_species(diet)
 end
 
 puts 'Seeding species'
