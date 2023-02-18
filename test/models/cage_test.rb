@@ -73,4 +73,22 @@ class CageTest < ActiveSupport::TestCase
     assert_equal 0, cage1.dinosaurs.size
 
   end
+
+  test "verify maximum dinosaur count in a cage" do
+    dinosaur1 = Dinosaur.create!(name: 'Bobbie Joe', species: @species, diet: @diet)
+    dinosaur2 = Dinosaur.create!(name: 'Billie Jean', species: @species, diet: @diet)
+    dinosaur3 = Dinosaur.create!(name: 'Betty Sue', species: @species, diet: @diet)
+    dinosaur4 = Dinosaur.create!(name: 'Alice', species: @species, diet: @diet)
+
+    cage = Cage.create!(number: 'limited 01', species: @species, diet: @diet)
+
+    cage.dinosaurs << dinosaur1
+    cage.dinosaurs << dinosaur2
+    cage.dinosaurs << dinosaur3
+    assert cage.save
+
+    cage.dinosaurs << dinosaur4
+    refute cage.valid?
+    assert_includes cage.errors.full_messages, 'Cage has too many residents', "oops: errors: #{cage.errors.inspect}"
+  end
 end

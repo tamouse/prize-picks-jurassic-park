@@ -2,6 +2,11 @@
 
 # The cages are numbered, but the numbers are treated as names.
 class Cage < ApplicationRecord
+  # The maximum number of dinosaurs a cage can hold.
+  # Note: In a production environment, this would have to be tunable. This is not the best
+  #   place to declare the constant.
+  MAX_CAGE_RESIDENTS = ENV['MAX_CAGE_RESIDENTS'] || 3
+
   # Cage's diet doesn't get set until first dinosaur is added
   belongs_to :diet, optional: true
   belongs_to :species, optional: true
@@ -11,6 +16,7 @@ class Cage < ApplicationRecord
   before_validation :update_diet_and_species
   validates :number, presence: true, uniqueness: true
   validate :compatibility
+  validate :not_overfilled
 
   delegate :herbivore, :herbivore?, :carnivore, :carnivore?, to: :diet, allow_nil: true
 
@@ -44,6 +50,11 @@ class Cage < ApplicationRecord
     end
   end
 
+  def not_overfilled
+    if dinosaurs.length > MAX_CAGE_RESIDENTS
+      errors.add(:cage, 'has too many residents')
+    end
+  end
 
   def get_next_number
     max = self.class.maximum(:number)
