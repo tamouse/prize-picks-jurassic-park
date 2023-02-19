@@ -22,6 +22,8 @@ class Cage < ApplicationRecord
   validates :power_status, presence: true, inclusion: { in: POWER_STATUSES }
   validate :compatibility
   validate :not_overfilled
+  validate :power_down_with_dinosaurs
+  validate :power_up_when_adding_dinosaur
 
   delegate :herbivore, :herbivore?, :carnivore, :carnivore?, to: :diet, allow_nil: true
   delegate :name, to: :diet, prefix: true, allow_nil: true
@@ -39,6 +41,16 @@ class Cage < ApplicationRecord
     self if save
   end
 
+  def power_down!
+    self.power_status = POWER_STATUS_DOWN
+    save!
+  end
+
+  def power_up!
+    self.power_status = POWER_STATUS_ACTIVE
+    save!
+  end
+
   private
 
   def compatibility
@@ -48,7 +60,7 @@ class Cage < ApplicationRecord
 
     if dinosaurs.joins(:diet).any? { _1.diet != diet }
       errors.add(:dinosaurs, 'must all have same diet')
-    elsif :carnivore? && dinosaurs.joins(:species).any? { _1.species != species }
+    elsif carnivore? && dinosaurs.joins(:species).any? { _1.species != species }
       errors.add(:dinosaurs, 'must all be same species when carnivore')
     end
   end
@@ -73,6 +85,20 @@ class Cage < ApplicationRecord
   def not_overfilled
     if dinosaurs.length > MAX_CAGE_RESIDENTS
       errors.add(:cage, 'has too many residents')
+    end
+  end
+
+  def power_down_with_dinosaurs
+    if power_status == POWER_STATUS_DOWN && dinosaurs.length > 0
+      errors.add(:power_status, "can't be powered off if dinosaurs are in cage")
+    end
+  end
+
+  def power_up_when_adding_dinosaur
+    return if changes.fetch('power_status', false)
+
+    unless power_status == POWER_STATUS_ACTIVE
+      errors.add(:dinosaurs, "can't be added to a powered off cage")
     end
   end
 

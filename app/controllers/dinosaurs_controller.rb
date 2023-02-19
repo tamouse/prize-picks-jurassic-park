@@ -1,8 +1,14 @@
 class DinosaursController < ApplicationController
+  before_action :set_cage
   before_action :set_dinosaur, only: %i[ show update destroy ]
 
   def index
-    @dinosaurs = Dinosaur.all
+    @dinosaurs =
+      if @cage.present?
+        @cage.dinosaurs
+      else
+        Dinosaur.all
+      end
 
     payload = {
       dinosaurs: @dinosaurs.map { render_dinosaur(_1, false) }
@@ -40,13 +46,26 @@ class DinosaursController < ApplicationController
   end
 
   def destroy
-    @dinosaur.destroy
+    if @dinosaur.destroy
+      render status: :no_content
+    else
+      render json: @dinosaur.errors, status: :unprocessable_entity
+    end
   end
 
   private
 
+  def set_cage
+    @cage = params[:cage_id] ? Cage.find(params[:cage_id]) : nil
+  end
+
   def set_dinosaur
-    @dinosaur = Dinosaur.find(params[:id])
+    @dinosaur =
+      if @cage.present?
+        @cage.dinosaurs.find(params[:id])
+      else
+        Dinosaur.find(params[:id])
+      end
   end
 
   def create_params
