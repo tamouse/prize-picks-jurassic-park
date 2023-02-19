@@ -67,26 +67,39 @@ I have implemented (so far):
   3. Automated tests for everything implemented. 
      
      While I don't always follow a strict TDD / BDD paradigm, those thoughts are sitting in my head often when I'm sketching out the initial bits of a model or controller, and the test comes soon after.
-  
+
+  4. Cages have a maximum capacity for how many dinosaurs it can hold.
+
+     I created a constant, MAX_CAGE_RESIDENTS, which can be set with an ENV variable at startup. The default is 3.
+
+  5. Cages have a power status of ACTIVE or DOWN.
+
+     The `power_status` field is a string, and there are constants defined which limit what the statuses can be. While this could have been done with a boolean, more status values could be needed in the future.
+
+     I created some methods in the model and actions in the controller to easily set the power status: e.g.:`:power_down!`. 
+
+  6. Cages cannot be powered off if they contain dinosaurs.
+
+     Implemented via a validation in `Cage`.
+
+  7. Dinosaurs cannot be moved to a cage that is powered down.
+
+     Also implemented via a validation in `Cage`.
+
+Additional items:
+
+  8. Added `:dinosaurs` as a resource under the `:cage` resource in `config/routs.rb`. All actions in `DinosaursController` work whether called with the `cages/:cage_id/dinosaurs` path or just `dinosaurs/`.
+
 #### Not implemented ####
 
 Items not done:
-  1. Cages have a maximum capacity for how many dinosaurs it can hold. 
-    
-     To start off, determine a maximum number to be used for all the cages, and create it as a CONSTANT in an initializer. Add validations to verify that the maxium is not exceeded, in `Cage` (1st choice) or in `DinsosaurToCageService` (2nd choice, but kinda sketchy).
-  2. Cages have a power status of ACTIVE or DOWN. 
-      
-     Add a boolean field to the `cages` table; make non-nullable with a default of `true`. Create methods in `Cage` to implement the `down`, `down!`, and `down?` methods, and hte `active`, `active!`, and `active?` operators.
-  3. Cages cannot be powered off if they contain dinosaurs. 
-      
-     Using the `dinosaurs_count` counter cache if we trust it and never allow and `down!` operator when `dinosaur_count` is greater than zero.   
-     
-     [And of course, this is Jurassic Park -- there won't be any power outages, right? Right??]
-  4. Dinosaurs cannot be moved to a cage that is powered down. 
 
-     Add a validator to the `Cage` model to prevent this from happening.
-  5. When querying dinosaurs or cages, they should be filterable or their attributes (Cages on power status, Dinosaurs on species). 
+  9. The full experience for #8 above still needs to be wired up, but I envision the user being able to create a dinosaur in a specific cage, for example. 
+  
+     For this to work, the `DinosaurCreateService` should be able to take an optional `cage_id` during initialization of the operation instance.
+    
+  10. When querying dinosaurs or cages, they should be filterable or their attributes (Cages on power status, Dinosaurs on species). 
       
-     This should be done via the controllers, when they get the index of Cages and Dinosaurs, and pass the filters in as `where` clauses. 
+      This should be done via the controllers, when they get the index of Cages and Dinosaurs, and pass the filters in as `where` clauses. 
      
-     It would be interesting also if, for example, the Dinosaurs controller was also nested under the Cages controller in order to provide a url path like "/cages/12/dinosaurs" (to give all the dinosaurs in cage 12) or "/cages/12/dinosaurs?species=triceratops" to select only the triceratops that are in cage 12.
+      It would be interesting also if, for example, the Dinosaurs controller was also nested under the Cages controller in order to provide a url path like "/cages/12/dinosaurs" (to give all the dinosaurs in cage 12) or "/cages/12/dinosaurs?species=triceratops" to select only the triceratops that are in cage 12.
