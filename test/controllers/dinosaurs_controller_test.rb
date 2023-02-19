@@ -5,7 +5,7 @@ require "test_helper"
 class DinosaursControllerTest < ActionDispatch::IntegrationTest
   setup do
     @species = Fabricate :species
-    @cage = Fabricate :cage, diet: @species.diet
+    @cage = Fabricate :cage, diet: @species.diet, species: @species
     @dinosaur = Fabricate :dinosaur, species: @species, diet: @species.diet
   end
 

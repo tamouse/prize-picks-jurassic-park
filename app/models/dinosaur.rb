@@ -8,5 +8,8 @@ class Dinosaur < ApplicationRecord
 
   validates :name, presence: true, uniqueness: true
 
-  delegate :herbivore, :herbivore?, :carnivore, :carnivore?, to: :diet, allow_nil: true
+  delegate :herbivore, :herbivore?, :carnivore, :carnivore?, to: :diet
+  delegate :name, to: :diet, prefix: true # diet_name
+  delegate :name, to: :species, prefix: true # species_name
+  delegate :number, to: :cage, allow_nil: true, prefix: true # cage_number
 end
