@@ -1,6 +1,6 @@
 class DinosaursController < ApplicationController
   before_action :set_cage
-  before_action :set_dinosaur, only: %i[ show update destroy ]
+  before_action :set_dinosaur, only: %i[ show move update destroy ]
 
   def index
     @dinosaurs =
@@ -31,6 +31,20 @@ class DinosaursController < ApplicationController
     end
   end
 
+  def move
+    service = DinosaurUpdateService.new(
+      dinosaur: @dinosaur,
+      name: update_params[:name],
+      alive: update_params[:alive],
+      cage_id: update_params[:cage_id]
+    )
+    if service.update
+      render json: render_dinosaur(service.dinosaur)
+    else
+      render json: service.errors, status: :unprocessable_entity
+    end
+  end
+
   def update
     service = DinosaurUpdateService.new(
       dinosaur: @dinosaur,
@@ -55,6 +69,25 @@ class DinosaursController < ApplicationController
 
   private
 
+  def create_params
+    params.require(:dinosaur).permit(:name, :species_id).to_h.symbolize_keys
+  end
+
+  def move_params
+    params.require(:dinosaur).permit(:cage_id)
+  end
+
+  def render_dinosaur(dinosaur, root = true)
+    dinosaur.as_json(
+      root: root,
+      include: [
+        cage: { include: :diet },
+        species: { include: :diet },
+        diet: {}
+      ]
+    )
+  end
+
   def set_cage
     @cage = params[:cage_id] ? Cage.find(params[:cage_id]) : nil
   end
@@ -68,23 +101,8 @@ class DinosaursController < ApplicationController
       end
   end
 
-  def create_params
-    params.require(:dinosaur).permit(:name, :species_id).to_h.symbolize_keys
-  end
-
   def update_params
     params.require(:dinosaur).permit(:name, :alive, :cage_id)
-  end
-
-  def render_dinosaur(dinosaur, root = true)
-    dinosaur.as_json(
-      root: root,
-      include: [
-        cage: { include: :diet },
-        species: { include: :diet },
-        diet: {}
-      ]
-    )
   end
 
 end
