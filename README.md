@@ -32,6 +32,10 @@ There are a number of tests. Running tests is easy with:
 
     bin/rails test
     
+### Insominia verification ###
+
+There are some Insomnia scripts in the `./scripts/insomnia/` directory for checking the API live. 
+    
 ## Environments ##
 
 This project only supports the `:development` and `:test` environments.
@@ -90,14 +94,15 @@ Additional items:
 
   8. Added `:dinosaurs` as a resource under the `:cage` resource in `config/routs.rb`. All actions in `DinosaursController` work whether called with the `cages/:cage_id/dinosaurs` path or just `dinosaurs/`.
 
-#### Not implemented ####
-
-Items not done:
-
   9. The full experience for #8 above still needs to be wired up, but I envision the user being able to create a dinosaur in a specific cage, for example. 
   
      For this to work, the `DinosaurCreateService` should be able to take an optional `cage_id` during initialization of the operation instance.
-    
+ 
+
+#### Not implemented ####
+
+Items not done:
+   
   10. When querying dinosaurs or cages, they should be filterable or their attributes (Cages on power status, Dinosaurs on species). 
       
       This should be done via the controllers, when they get the index of Cages and Dinosaurs, and pass the filters in as `where` clauses. 
