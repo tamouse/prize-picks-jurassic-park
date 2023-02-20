@@ -59,7 +59,24 @@ class DinosaursControllerTest < ActionDispatch::IntegrationTest
     @new_cage = Fabricate :cage, diet: @species.diet, species: @species
 
 
-    patch move_dinosaur_url(@dinosaur), params: { dinosaur: { cage_id: @new_cage.id}}
+    patch move_dinosaur_url(@dinosaur), params: { dinosaur: { new_cage_id: @new_cage.id}}
+    assert_response :success
+
+    @dinosaur.reload
+    @cage.reload
+    @new_cage.reload
+    refute_equal @cage, @dinosaur.cage
+    assert_equal @new_cage, @dinosaur.cage
+  end
+
+  test "can move a dinosaur to an empty cage" do
+    service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @cage)
+    assert service.assign
+    assert_equal @cage, @dinosaur.cage
+
+    @new_cage = Fabricate :cage
+
+    patch move_dinosaur_url(@dinosaur), params: { dinosaur: { new_cage_id: @new_cage.id}}
     assert_response :success
 
     @dinosaur.reload
@@ -72,11 +89,11 @@ class DinosaursControllerTest < ActionDispatch::IntegrationTest
   test "cannot move a dinosaur to a powered down cage" do
     service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @cage)
     assert service.assign
-    assert_equal @cage, @dinosaur.cage
+    assert_equal @cage.reload, @dinosaur.reload.cage
 
     @new_cage = Fabricate :cage, diet: @species.diet, species: @species, power_status: 'down'
 
-    patch move_dinosaur_url(@dinosaur), params: { dinosaur: { cage_id: @new_cage.id}}
+    patch move_dinosaur_url(@dinosaur), params: { dinosaur: { new_cage_id: @new_cage.id}}
     assert_response :unprocessable_entity
 
     @dinosaur.reload

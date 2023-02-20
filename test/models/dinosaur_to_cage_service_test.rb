@@ -8,12 +8,8 @@ class DinosaurToCageServiceTest < ActiveSupport::TestCase
     diet = Fabricate :diet
     species = Fabricate :species, diet: diet
     @cage = Fabricate :cage, species: species, diet: diet
-    @new_cage = Fabricate :cage, species: species, diet: diet
+    @new_cage = Fabricate :cage
     @dinosaur = Fabricate :dinosaur, species: species, diet: diet
-  end
-
-  teardown do
-
   end
 
   test 'can initialize the service' do
@@ -34,5 +30,16 @@ class DinosaurToCageServiceTest < ActiveSupport::TestCase
     service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @new_cage)
     refute service.assign
     refute_equal @new_cage, @dinosaur.reload.cage, "oops: service.errors: #{service.errors.details.inspect}"
+  end
+
+  test "can assign a new cage with no species or diet assigned yet" do
+    service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @new_cage)
+    assert service.assign
+    assert_equal @new_cage, @dinosaur.reload.cage, "oops: service.errors: #{service.errors.details.inspect}"
+  end
+
+  test "can create a new cage when necessary" do
+    service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: nil)
+    assert service.assign
   end
 end

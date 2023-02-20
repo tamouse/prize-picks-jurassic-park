@@ -41,6 +41,10 @@ class Cage < ApplicationRecord
     self if save
   end
 
+  def full?
+    dinosaurs.length >= MAX_CAGE_RESIDENTS
+  end
+
   def power_down!
     self.power_status = POWER_STATUS_DOWN
     save!
@@ -54,7 +58,7 @@ class Cage < ApplicationRecord
   private
 
   def compatibility
-    return if dinosaurs.count.zero?
+    return if dinosaurs.length.zero?
     # Herbivore cages can't hold any carnivores
     # Carnivore cages can only hold one species
 

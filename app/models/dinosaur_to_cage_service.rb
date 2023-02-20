@@ -7,7 +7,7 @@ class DinosaurToCageService
   attr_reader :cage
 
   validates_presence_of :dinosaur
-  validates_presence_of :cage, on: :create
+  validates_presence_of :cage, on: :ensure
   validate on: :assign do
     if dinosaur.cage != cage
       errors.add(:base, 'Assignment of dinosaur #{dinosaur.id} to cage #{cage.id} failed')
@@ -20,13 +20,12 @@ class DinosaurToCageService
   end
 
   def assign
-    return true if dinosaur.cage == cage
     return false unless valid?
 
     old_cage = dinosaur.cage
 
     @cage = ensure_cage_is_ready
-    return false unless valid?(:create)
+    return false unless valid?(:ensure)
 
     dinosaur.cage = cage
     unless dinosaur.save && cage.save
@@ -43,7 +42,7 @@ class DinosaurToCageService
   private
 
   def ensure_cage_is_ready
-    return @cage if cage&.persisted? && cage.dinosaurs.length <= Cage::MAX_CAGE_RESIDENTS
+    return @cage if cage&.persisted? && !cage&.full?
 
     Cage.create_with_next_number(diet: dinosaur.species.diet, species: dinosaur.species)
   end

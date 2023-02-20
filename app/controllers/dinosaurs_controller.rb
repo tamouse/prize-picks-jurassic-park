@@ -32,13 +32,12 @@ class DinosaursController < ApplicationController
   end
 
   def move
-    service = DinosaurUpdateService.new(
+    new_cage = Cage.find(move_params[:new_cage_id])
+    service = DinosaurToCageService.new(
       dinosaur: @dinosaur,
-      name: update_params[:name],
-      alive: update_params[:alive],
-      cage_id: update_params[:cage_id]
+      cage: new_cage
     )
-    if service.update
+    if service.assign
       render json: render_dinosaur(service.dinosaur)
     else
       render json: service.errors, status: :unprocessable_entity
@@ -74,7 +73,7 @@ class DinosaursController < ApplicationController
   end
 
   def move_params
-    params.require(:dinosaur).permit(:cage_id)
+    params.require(:dinosaur).permit(:new_cage_id)
   end
 
   def render_dinosaur(dinosaur, root = true)
