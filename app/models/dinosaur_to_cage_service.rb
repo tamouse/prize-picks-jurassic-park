@@ -23,12 +23,15 @@ class DinosaurToCageService
     return true if dinosaur.cage == cage
     return false unless valid?
 
+    old_cage = dinosaur.cage
+
     @cage = ensure_cage_is_ready
     return false unless valid?(:create)
 
     dinosaur.cage = cage
     unless dinosaur.save && cage.save
       dinosaur.errors.full_messages.each { |e| errors.add(:dinosaur, e) } if dinosaur.errors
+      dinosaur.update(cage: old_cage)
       cage.errors.full_messages.each { |e| errors.add(:cage, e) } if cage.errors
 
       return false

@@ -1,8 +1,14 @@
 class DinosaursController < ApplicationController
-  before_action :set_dinosaur, only: %i[ show update destroy ]
+  before_action :set_cage
+  before_action :set_dinosaur, only: %i[ show move update destroy ]
 
   def index
-    @dinosaurs = Dinosaur.all
+    @dinosaurs =
+      if @cage.present?
+        @cage.dinosaurs
+      else
+        Dinosaur.all
+      end
 
     payload = {
       dinosaurs: @dinosaurs.map { render_dinosaur(_1, false) }
@@ -25,6 +31,20 @@ class DinosaursController < ApplicationController
     end
   end
 
+  def move
+    service = DinosaurUpdateService.new(
+      dinosaur: @dinosaur,
+      name: update_params[:name],
+      alive: update_params[:alive],
+      cage_id: update_params[:cage_id]
+    )
+    if service.update
+      render json: render_dinosaur(service.dinosaur)
+    else
+      render json: service.errors, status: :unprocessable_entity
+    end
+  end
+
   def update
     service = DinosaurUpdateService.new(
       dinosaur: @dinosaur,
@@ -40,21 +60,21 @@ class DinosaursController < ApplicationController
   end
 
   def destroy
-    @dinosaur.destroy
+    if @dinosaur.destroy
+      render status: :no_content
+    else
+      render json: @dinosaur.errors, status: :unprocessable_entity
+    end
   end
 
   private
-
-  def set_dinosaur
-    @dinosaur = Dinosaur.find(params[:id])
-  end
 
   def create_params
     params.require(:dinosaur).permit(:name, :species_id).to_h.symbolize_keys
   end
 
-  def update_params
-    params.require(:dinosaur).permit(:name, :alive, :cage_id)
+  def move_params
+    params.require(:dinosaur).permit(:cage_id)
   end
 
   def render_dinosaur(dinosaur, root = true)
@@ -66,6 +86,23 @@ class DinosaursController < ApplicationController
         diet: {}
       ]
     )
+  end
+
+  def set_cage
+    @cage = params[:cage_id] ? Cage.find(params[:cage_id]) : nil
+  end
+
+  def set_dinosaur
+    @dinosaur =
+      if @cage.present?
+        @cage.dinosaurs.find(params[:id])
+      else
+        Dinosaur.find(params[:id])
+      end
+  end
+
+  def update_params
+    params.require(:dinosaur).permit(:name, :alive, :cage_id)
   end
 
 end

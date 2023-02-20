@@ -91,4 +91,14 @@ class CageTest < ActiveSupport::TestCase
     refute cage.valid?
     assert_includes cage.errors.full_messages, 'Cage has too many residents', "oops: errors: #{cage.errors.inspect}"
   end
+
+  test "verify power can be turned off only when there are no dinosaurs" do
+    cage = Fabricate(:cage, species: @species, diet: @diet)
+    cage.power_status = 'down'
+    assert cage.valid?, "oops: cage.errors: #{cage.errors.details.inspect}"
+
+    cage.reload
+    assert cage.power_down!, "oops: cage.errors: #{cage.errors.details.inspect}"
+    assert_equal 'down', cage.power_status, "oops: cage.errors: #{cage.errors.details.inspect}"
+  end
 end

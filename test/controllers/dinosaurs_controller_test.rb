@@ -5,7 +5,7 @@ require "test_helper"
 class DinosaursControllerTest < ActionDispatch::IntegrationTest
   setup do
     @species = Fabricate :species
-    @cage = Fabricate :cage, diet: @species.diet
+    @cage = Fabricate :cage, diet: @species.diet, species: @species
     @dinosaur = Fabricate :dinosaur, species: @species, diet: @species.diet
   end
 
@@ -49,6 +49,41 @@ class DinosaursControllerTest < ActionDispatch::IntegrationTest
   test "should show dinosaur" do
     get dinosaur_url(@dinosaur), as: :json
     assert_response :success
+  end
+
+  test "can move a dinosaur to a different cage" do
+    service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @cage)
+    assert service.assign
+    assert_equal @cage, @dinosaur.cage
+
+    @new_cage = Fabricate :cage, diet: @species.diet, species: @species
+
+
+    patch move_dinosaur_url(@dinosaur), params: { dinosaur: { cage_id: @new_cage.id}}
+    assert_response :success
+
+    @dinosaur.reload
+    @cage.reload
+    @new_cage.reload
+    refute_equal @cage, @dinosaur.cage
+    assert_equal @new_cage, @dinosaur.cage
+  end
+
+  test "cannot move a dinosaur to a powered down cage" do
+    service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @cage)
+    assert service.assign
+    assert_equal @cage, @dinosaur.cage
+
+    @new_cage = Fabricate :cage, diet: @species.diet, species: @species, power_status: 'down'
+
+    patch move_dinosaur_url(@dinosaur), params: { dinosaur: { cage_id: @new_cage.id}}
+    assert_response :unprocessable_entity
+
+    @dinosaur.reload
+    @cage.reload
+    @new_cage.reload
+    refute_equal @new_cage, @dinosaur.cage
+    assert_equal @cage, @dinosaur.cage
   end
 
   test "should update dinosaur" do

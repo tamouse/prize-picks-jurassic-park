@@ -2,9 +2,8 @@
 
 # Might now want to expose all of these in an API ?
 class CagesController < ApplicationController
-  before_action :set_cage, only: %i[ show update destroy ]
+  before_action :set_cage, only: %i[ show update power_down power_up destroy ]
 
-  # GET /cages
   def index
     @cages = Cage.all
 
@@ -14,12 +13,10 @@ class CagesController < ApplicationController
     render json: payload
   end
 
-  # GET /cages/1
   def show
     render json: render_cage(@cage)
   end
 
-  # POST /cages
   def create
     # TODO: Replace this with an operation
     @cage = Cage.new(cage_params)
@@ -31,7 +28,6 @@ class CagesController < ApplicationController
     end
   end
 
-  # PATCH/PUT /cages/1
   def update
     # TODO: Replace this with an operation
     if @cage.update(cage_params)
@@ -41,7 +37,22 @@ class CagesController < ApplicationController
     end
   end
 
-  # DELETE /cages/1
+  def power_down
+    if @cage.power_down!
+      render json: render_cage(@cage)
+    else
+      render json: @cage.errors, status: :unprocessable_entity
+    end
+  end
+
+  def power_up
+    if @cage.power_up!
+      render json: render_cage(@cage)
+    else
+      render json: @cage.errors, status: :unprocessable_entity
+    end
+  end
+
   def destroy
     # TODO: Replace this with an operation
     @cage.destroy
@@ -56,7 +67,7 @@ class CagesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def cage_params
-    params.require(:cage).permit(:number, :diet_id)
+    params.require(:cage).permit(:number, :diet_id, :species_id, :power_status)
   end
 
   def render_cage(cage, root = true)
@@ -66,9 +77,9 @@ class CagesController < ApplicationController
         dinosaurs: {
           include: [:species, :diet]
         },
+        species: {},
         diet: {}
       ]
     )
   end
-
 end
