@@ -29,4 +29,10 @@ class DinosaurToCageServiceTest < ActiveSupport::TestCase
     assert_equal @new_cage, @dinosaur.cage
   end
 
+  test 'cannot move dinosaurs to a different cage if powered down' do
+    assert @new_cage.power_down!
+    service = DinosaurToCageService.new(dinosaur: @dinosaur, cage: @new_cage)
+    refute service.assign
+    refute_equal @new_cage, @dinosaur.reload.cage, "oops: service.errors: #{service.errors.details.inspect}"
+  end
 end

@@ -29,6 +29,7 @@ class DinosaurToCageService
     dinosaur.cage = cage
     unless dinosaur.save && cage.save
       dinosaur.errors.full_messages.each { |e| errors.add(:dinosaur, e) } if dinosaur.errors
+      dinosaur.update(cage_id: nil)
       cage.errors.full_messages.each { |e| errors.add(:cage, e) } if cage.errors
 
       return false
